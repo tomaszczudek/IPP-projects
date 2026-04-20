@@ -1,0 +1,306 @@
+Array
+(
+    [classes] => Array
+        (
+            [0] => Array
+                (
+                    [name] => MyInt
+                    [parent] => Integer
+                    [methods] => Array
+                        (
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [name] => Main
+                    [parent] => Object
+                    [methods] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [selector] => run
+                                    [block] => Array
+                                        (
+                                            [type] => block
+                                            [arity] => 0
+                                            [parameters] => Array
+                                                (
+                                                )
+
+                                            [statements] => Array
+                                                (
+                                                    [0] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => x
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => literal
+                                                                    [class] => Integer
+                                                                    [value] => 1
+                                                                )
+
+                                                        )
+
+                                                    [1] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => y
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => literal
+                                                                    [class] => Integer
+                                                                    [value] => 1
+                                                                )
+
+                                                        )
+
+                                                    [2] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => z
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => message_send
+                                                                    [selector] => from:
+                                                                    [receiver] => Array
+                                                                        (
+                                                                            [type] => literal
+                                                                            [class] => class
+                                                                            [value] => Integer
+                                                                        )
+
+                                                                    [arguments] => Array
+                                                                        (
+                                                                            [0] => Array
+                                                                                (
+                                                                                    [type] => literal
+                                                                                    [class] => Integer
+                                                                                    [value] => 1
+                                                                                )
+
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [3] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => u
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => message_send
+                                                                    [selector] => from:
+                                                                    [receiver] => Array
+                                                                        (
+                                                                            [type] => literal
+                                                                            [class] => class
+                                                                            [value] => MyInt
+                                                                        )
+
+                                                                    [arguments] => Array
+                                                                        (
+                                                                            [0] => Array
+                                                                                (
+                                                                                    [type] => literal
+                                                                                    [class] => Integer
+                                                                                    [value] => 1
+                                                                                )
+
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [4] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => w
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => message_send
+                                                                    [selector] => from:
+                                                                    [receiver] => Array
+                                                                        (
+                                                                            [type] => literal
+                                                                            [class] => class
+                                                                            [value] => MyInt
+                                                                        )
+
+                                                                    [arguments] => Array
+                                                                        (
+                                                                            [0] => Array
+                                                                                (
+                                                                                    [type] => literal
+                                                                                    [class] => Integer
+                                                                                    [value] => 1
+                                                                                )
+
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                    [5] => Array
+                                                        (
+                                                            [variable] => Array
+                                                                (
+                                                                    [type] => variable
+                                                                    [name] => a
+                                                                )
+
+                                                            [expression] => Array
+                                                                (
+                                                                    [type] => message_send
+                                                                    [selector] => ifTrue:ifFalse:
+                                                                    [receiver] => Array
+                                                                        (
+                                                                            [type] => message_send
+                                                                            [selector] => equalTo:
+                                                                            [receiver] => Array
+                                                                                (
+                                                                                    [type] => variable
+                                                                                    [name] => x
+                                                                                )
+
+                                                                            [arguments] => Array
+                                                                                (
+                                                                                    [0] => Array
+                                                                                        (
+                                                                                            [type] => variable
+                                                                                            [name] => y
+                                                                                        )
+
+                                                                                )
+
+                                                                        )
+
+                                                                    [arguments] => Array
+                                                                        (
+                                                                            [0] => Array
+                                                                                (
+                                                                                    [type] => block
+                                                                                    [arity] => 0
+                                                                                    [parameters] => Array
+                                                                                        (
+                                                                                        )
+
+                                                                                    [statements] => Array
+                                                                                        (
+                                                                                            [0] => Array
+                                                                                                (
+                                                                                                    [variable] => Array
+                                                                                                        (
+                                                                                                            [type] => variable
+                                                                                                            [name] => _
+                                                                                                        )
+
+                                                                                                    [expression] => Array
+                                                                                                        (
+                                                                                                            [type] => message_send
+                                                                                                            [selector] => print
+                                                                                                            [receiver] => Array
+                                                                                                                (
+                                                                                                                    [type] => literal
+                                                                                                                    [class] => String
+                                                                                                                    [value] => ANO
+                                                                                                                )
+
+                                                                                                            [arguments] => Array
+                                                                                                                (
+                                                                                                                )
+
+                                                                                                        )
+
+                                                                                                )
+
+                                                                                        )
+
+                                                                                )
+
+                                                                            [1] => Array
+                                                                                (
+                                                                                    [type] => block
+                                                                                    [arity] => 0
+                                                                                    [parameters] => Array
+                                                                                        (
+                                                                                        )
+
+                                                                                    [statements] => Array
+                                                                                        (
+                                                                                            [0] => Array
+                                                                                                (
+                                                                                                    [variable] => Array
+                                                                                                        (
+                                                                                                            [type] => variable
+                                                                                                            [name] => _
+                                                                                                        )
+
+                                                                                                    [expression] => Array
+                                                                                                        (
+                                                                                                            [type] => message_send
+                                                                                                            [selector] => print
+                                                                                                            [receiver] => Array
+                                                                                                                (
+                                                                                                                    [type] => literal
+                                                                                                                    [class] => String
+                                                                                                                    [value] => NE
+                                                                                                                )
+
+                                                                                                            [arguments] => Array
+                                                                                                                (
+                                                                                                                )
+
+                                                                                                        )
+
+                                                                                                )
+
+                                                                                        )
+
+                                                                                )
+
+                                                                        )
+
+                                                                )
+
+                                                        )
+
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
