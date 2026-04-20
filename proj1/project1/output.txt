@@ -1,0 +1,60 @@
+Za povinnou XML hlavičkou21 následuje kořenový element program s povinným textovým atribu-
+tem language s hodnotou "SOL25" a textovým atributem description obsahujícím lexikálně první
+komentář ze zdrojového kódu včetně bílých znaků a odřádkování převedeného na &nbsp;. (Chybí-li
+takový komentář, atribut je vynechán.)
+
+Element program obsahuje pro uživatelsky definované třídy podelementy class. Každý element
+class obsahuje dva povinné atributy: (1) name s identifikátorem třídy a (2) parent s identifikátorem
+nadtřídy (rodiče). Element class pak obsahuje podelement method pro každou definovanou instanční
+metodu, a to s povinným atributem selector pro určení selektoru definované metody. Element
+metody potom obsahuje element pro blok s odpovídajícím počtem argumentů.
+
+Při generování některých elementů (příkazy v bloku, parametry, argumenty) je třeba definovat
+pořadí v rámci společného nadelementu, což se provádí povinným textovým atributem order, který
+je vždy číslován souvisle a od jedničky.
+
+Blok je reprezentován elementem block s povinným atributem arity udávajícím počet očekáva-
+ných argumentů pro budoucí vyhodnocení bloku. Element block obsahuje podelementy parameter
+pro každý parametr bloku se dvěma povinným atributy order a name pro pořadí a identifikátor
+parametru. Dále element block obsahuje podelementy pro každý příkaz sekvence příkazů. Příkaz je
+reprezentován elementem assign s povinným atributem order pro určení pořadí příkazu v sekvenci
+příkazů. 
+------------------------------------------------------------------------------------------------------ DONE
+
+
+Příkaz zahrnuje dva povinné podelementy var s atributem name pro identifikátor cílové
+proměnné a podelement expr pro výraz pro výpočet přiřazované hodnoty.
+
+Výraz (element expr) obsahuje jeden podelement podle druhu výrazu: (1) literál (literal, viz
+dále), (2) proměnná (var, viz výše), (3) blokový literál (block, viz výše) nebo (4) zaslání zprávy
+(send, viz dále).
+Element literal obsahuje dva povinné textové atributy class s identifikátorem vestavěné třídy
+(Integer/String/Nil/True/False) a atribut value reprezentující hodnotu literálu (primitivní), např.
+číslo -10, prázdný řetězec, či true. U literálů typu String a podobně při zápisu do XML atributů
+nepřevádějte původní escape sekvence, ale pouze pro problematické znaky v XML (<, >, &,'
+,
+") využijte odpovídající XML entity (&lt;, &gt;, &amp;, &apos;, &quot;). Pro vyjádření literálu
+identifikátoru třídy je atribut class nastaven na "class" a value obsahuje identifikátor třídy. Literál
+bloku je reprezentován elementem block (viz výše).
+Zaslání zprávy je reprezentováno elementem send, jehož selektor zprávy je uložen v povinném
+textovém atributu selector. Výraz pro vyhodnocení příjemce zprávy je v podelementu expr (viz
+výše). Pokud se jedná o zprávu s parametry, obsahuje element send ještě podelement arg pro každý
+argument předávaný zprávě. Element arg má povinný argument order a obsahuje právě jeden po-
+delement expr (viz výše) pro výraz, jehož vyhodnocením získáme skutečný argument zprávy.
+Příklad úryvku jazyka SOL25:
+[ :one :two | r := Integer from : two. ]
+a jemu odpovídající XML:
+<block arity ="2">
+<parameter name ="one" order ="1" />
+<parameter name ="two" order ="2"> </ parameter >
+<assign order ="1">
+<var name ="r"/>
+<expr >
+<send selector =" from :">
+<expr >< literal class =" class " <arg order ="1">
+<expr ><var name ="two" /> </expr >
+</arg >
+</ send >
+</ expr >
+</ assign >
+</ block >

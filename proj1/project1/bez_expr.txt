@@ -1,0 +1,213 @@
+import sys
+import lark
+import argparse
+import xml.etree.ElementTree as ET
+import xml.dom.minidom
+import re
+
+parser_arg = argparse.ArgumentParser(
+    description=(
+        "Analyzátor kódu v SOL25 (parse.py)."
+        "Skript načte zdrojový kód v SOL25 ze standardního vstupu, "
+        "zkontroluje lexikální, syntaktickou a statickou sémantickou správnost kódu "
+        "a vypíše XML reprezentaci abstraktního syntaktického stromu (AST)."
+    ),
+    add_help=False
+)
+
+parser_arg.add_argument("-h", "--help", action="store_true", help="Zobrazí tuto nápovědu.")
+
+try:
+    args = parser_arg.parse_args()
+except SystemExit:
+    sys.exit(10)
+
+if args.help:
+    if len(sys.argv) > 2:
+        sys.exit(10)
+    parser_arg.print_help()
+    sys.exit(0)
+
+key_words = {"class", "self", "super", "nil", "true", "false"}
+built_in = list(["Object", "Nil", "True", "False", "Integer", "String", "Block"])
+
+grammar = r'''
+    program: classdec program | 
+    classdec: "class" cid ":" cid "{" method "}"
+    method: selector block method | 
+    
+    selector: id | id_ selector_tail
+    selector_tail: id_ selector_tail | 
+
+    block: "[" block_par "|" block_stat "]"
+    block_par: _id block_par | 
+    block_stat: id ":=" expr "." block_stat | 
+
+    expr: expr_base expr_tail
+    expr_tail: id | expr_sel
+    expr_sel: id_ expr_base expr_sel | 
+    expr_base: int | str | id | cid | block | "(" expr ")"
+
+    id: /[a-z_][a-zA-Z0-9_]*/
+    id_: /[a-z_][a-zA-Z0-9_]*[:]/
+    _id: /[:][a-z_][a-zA-Z0-9_]*/
+    
+    cid: /[A-Z][a-zA-Z0-9]*/
+    int: /[+-]?\d+/
+    
+    str: /[']([^\\'\n\x00-\x1F]|\\'|\\n|\\\\)*[']/
+
+    %ignore /\s+/
+'''
+
+try:
+    input_code = sys.stdin.read().strip()
+except (OSError, IOError):
+    sys.exit(11) 
+
+comments = re.findall(r'"(.*?)"', input_code, re.DOTALL)
+input_code = re.sub(r'"(.*?)"', ' ', input_code, flags=re.DOTALL)
+
+# OK
+def parse_program(tree):
+    if tree.children:
+        if len(comments) > 0:
+            node = ET.Element("program", language="SOL25", description=comments[0])
+        else:
+            node = ET.Element("program", language="SOL25")
+    
+    for classdec in list(tree.find_data("classdec"))[::-1]:
+        node.append(parse_classdec(classdec))
+    return node
+
+# OK
+def parse_classdec(tree):
+    nodes = list(tree.find_data("cid"))[::-1]
+    node = ET.Element("class", name=nodes[1].children[0], parent=nodes[0].children[0])
+    
+    nodes = list(tree.find_data("method"))[::-1]
+    for method in nodes:  # Procházíme metody podle indexu
+        if method.children:  # Pokud metoda má potomky (není prázdná)
+            node.append(parse_method(method))
+
+    return node
+
+# OK
+def parse_method(tree):
+    nodes = list(tree.children[0].find_data("selector"))[::-1]
+    nodes = list(nodes[0].find_data("id"))[::-1] or list(nodes[0].find_data("id_"))[::-1]
+
+    name = [id_node.children[0] for id_node in nodes]
+    node = ET.Element("method", selector=str("".join(name)))
+
+    block = tree.children[1]
+    if block.children:
+        node.append(parse_block(block))
+
+    return node
+
+# OK
+def parse_block(tree):
+    nodes = list(tree.children[0].scan_values(lambda v: isinstance(v, lark.Token)))
+    node = ET.Element("block", arity=str(len(nodes)))
+    order = 1
+    for i in range(len(nodes)):
+        node.append(ET.Element("parameter", name=nodes[i], order=str(order+i)))
+    order = 1
+    for block_stat in list(tree.children[1].find_data("block_stat"))[::-1]:
+        if block_stat.children:
+            node.append(parse_assign(block_stat,order))
+            order += 1
+    return node
+
+# OK
+def parse_assign(tree,order):
+    #print(tree.pretty())
+    node = ET.Element("assign", order=str(order))
+    node.append(ET.Element("var", name=tree.children[0].children[0]))
+    node.append(parse_expr(tree.children[1]))
+    return node
+
+# expr nejak zpracovat rekurzivne aby v tom nebyl chaos
+def parse_expr(tree):
+    #print(tree.pretty()) #expr
+    node = ET.Element("expr")
+    node.append(parse_expr_base(tree.children[0]))
+    node.append(parse_expr_tail(tree.children[1]))
+    
+    return node 
+
+def parse_expr_base(tree):
+    child = tree.children[0]
+    # just init
+    node = ET.Element("expr_base")
+    if isinstance(child.children[0], lark.Token):
+        node = ET.Element("var", name = str(child.children[0]))
+    elif child.data == "block":
+        node = parse_block(child)
+    elif child.data == "expr":
+        node = parse_expr(child)
+
+    return node
+
+def  parse_expr_tail(tree):
+    #expr_tail: id | expr_sel
+    node = ET.Element("expr_tail")
+    
+    if tree.children and tree.children[0].children:
+        if isinstance(tree.children[0].children[0], lark.Token):
+            node = ET.Element("var", name = str(tree.children[0].children[0]))
+        elif tree.children[0].children[0].data == "id_":
+            node = parse_expr_sel(tree.children[0])
+    
+    return node
+    
+def parse_expr_sel(tree):
+    #print(tree.pretty())
+    return ET.Element("expr_sel")
+
+def check_lex_token(token):
+    print(f"Kontroluji token: {token}", file=sys.stderr)  # Debug výpis
+    if token.value in key_words:
+        print(f"Chyba: '{token.value}' není platný identifikátor!", file=sys.stderr)
+        sys.exit(22)
+    return token
+
+try:
+    parser = lark.Lark(
+        grammar, 
+        start='program', 
+        parser="lalr", 
+        lexer_callbacks={
+            "id": check_lex_token,
+            "id_": check_lex_token,
+            "_id": check_lex_token,
+            "cid": check_lex_token
+        }
+    )
+    tree = parser.parse(input_code)
+except Exception as e:
+    print(f"Chyba: {e}", file=sys.stderr)
+except lark.exceptions.UnexpectedToken:
+    sys.exit(22)
+except lark.exceptions.LexError or lark.exceptions.UnexpectedCharacters:
+    sys.exit(21)
+except Exception:
+    sys.exit(99)
+
+#print(tree.pretty())
+# Generování XML
+document = parse_program(tree)
+xml_str = ET.tostring(document, encoding="utf-8").decode("utf-8")
+pretty_xml = xml.dom.minidom.parseString(xml_str).toprettyxml(indent="  ")
+#pretty_xml = pretty_xml.replace("</method>", "</method>\n")
+#pretty_xml = pretty_xml.replace("/>", " />")
+pretty_xml = pretty_xml.replace("<?xml version=\"1.0\" ?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+pretty_xml = pretty_xml.replace("classs", "class")
+
+try:
+    print(pretty_xml, flush=True)
+except (OSError, IOError):
+    sys.exit(12)
+
+

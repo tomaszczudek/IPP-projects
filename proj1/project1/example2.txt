@@ -1,0 +1,8 @@
+class Main : Object {
+     run    [|
+    x := 5.
+     y := x plus: 2.
+     x := y asString.
+     _ := x print.
+     ]
+ }

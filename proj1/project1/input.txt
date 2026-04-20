@@ -1,0 +1,7 @@
+class Main : Object {
+                run [|
+                    x := Integer new.
+                    x := (Integer from: (Integer new)).
+                    x := (((Integer from: ((Integer new))))).
+                ]
+            }

@@ -1,0 +1,50 @@
+_OPENBR:     "["     //symbol terms to avoid lexer errors instead of syntax faults
+_CLOSEBR:    "]"
+_OPENBL:     "{"
+_CLOSEBL:    "}"
+_OPENPR:     "("
+_CLOSEPR:    ")"
+_COLON:      ":"
+_PIPE:       "|"
+_DOT:        "."
+_ASSIGN:     ":="
+_SQUOTE:     "'"
+
+_CLASST:    "class"
+INTEGER:    /(\+|-)?[0-9]+/
+STRING:     _SQUOTE (VALIDCHARS | ESCCHARS)* _SQUOTE
+TRUE:       "true"
+FALSE:      "false"
+NIL:        "nil"
+CLASSID:    /[A-Z]([a-z]|[A-Z]|[0-9])*/             //Id
+IDENTCOL:   /(([a-z]|_)([a-z]|[A-Z]|_|[0-9])*:)+/   //The only case where whitespace is to be handled (id:)
+IDENT:      /([a-z]|_)([a-z]|[A-Z]|_|[0-9])*/       //id
+COLIDENT:   /:([a-z]|_)([a-z]|[A-Z]|_|[0-9])*/      //:id
+VALIDCHARS: /([\x20-\x26]|[\x28-\x5B]|[\x5D-\x7F])/ //Chars above 31 excl. ' and \
+ESCCHARS:   /\\'|\\n|\\\\/
+COMMENT:    /"[^"]*"/
+
+program:    class*
+class:      _CLASST CLASSID _COLON CLASSID _OPENBL method* _CLOSEBL
+method:     (_selector block)
+_selector:  IDENT | IDENTCOL
+block:      _OPENBR COLIDENT* _PIPE _blockstat* _CLOSEBR
+_blockstat:  IDENT _ASSIGN expr _DOT
+expr:       _exprbase _exprtail
+literal:    INTEGER 
+        |   STRING 
+        |   block
+        |   TRUE
+        |   FALSE
+        |   NIL
+_exprbase:  literal
+        |   IDENT 
+        |   CLASSID 
+        |   _OPENPR expr _CLOSEPR
+_exprtail:  IDENT | exprsel*
+exprsel:    IDENTCOL _exprbase
+
+
+%import common.WS
+%ignore WS 
+%ignore COMMENT

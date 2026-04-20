@@ -1,0 +1,70 @@
+program
+  classdec
+    Main
+    Object
+    method
+      selector	run
+      block
+        block_par
+        block_stat
+          x
+          expr
+            expr_base	Integer
+            new
+        block_stat
+          x
+          expr
+            expr_base
+              expr
+                expr_base	Integer
+                from:
+                expr_base
+                  expr
+                    expr_base	Integer
+                    new
+        block_stat
+          x
+          expr
+            expr_base
+              expr
+                expr_base
+                  expr
+                    expr_base
+                      expr
+                        expr_base	Integer
+                        from:
+                        expr_base
+                          expr
+                            expr_base
+                              expr
+                                expr_base	Integer
+                                new
+
+<?xml version="1.0" encoding="UTF-8"?>
+<program language="SOL25">
+  <class name="Main" parent="Object">
+    <method selector="run">
+      <block arity="0">
+        <assign order="1">
+          <var name="x" />
+          <expr>
+            <send selector="new">
+              <expr>
+                <literal class="class" value="Integer" />
+              </expr>
+            </send>
+          </expr>
+        </assign>
+        <assign order="2">
+          <var name="x" />
+          <expr />
+        </assign>
+        <assign order="3">
+          <var name="x" />
+          <expr />
+        </assign>
+      </block>
+    </method>
+  </class>
+</program>
+
